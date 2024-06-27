@@ -1,4 +1,7 @@
 from Ler_MontarGrafo.montar import criar_grafo_de_arquivo
+from LereMontar.menu import mostrar_menu
+from LereMontar.menu import obter_escolha, processar_escolha
+
 
 if __name__ == "__main__":
     # pergunta ao usuário se o grafo é direcionado ou não;
@@ -19,6 +22,10 @@ if __name__ == "__main__":
         # inicializa a criação e leitura do grafo;
         grafo = criar_grafo_de_arquivo(filename, direcionado)
         print(grafo) 
+        menu = mostrar_menu()
+        escolha = obter_escolha()
+        processar_escolha(escolha, grafo)
+        
     except ValueError as e:
         print(f"Erro: {e}")  # erro no caso o formato seja inválido;
     except FileNotFoundError as e:
