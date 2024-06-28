@@ -17,7 +17,7 @@ class Grafo:
                 self.adj_list[v1].append(v2)
                 if not self.direcionado:
                     self.adj_list[v2].append(v1)  # aresta bidirecional
-                    
+
     def __repr__(self):
         vertices_str = f'Vertices: {self.vertices}\n'
         arestas_str = 'Arestas: ['
@@ -34,14 +34,22 @@ class Grafo:
         for v in self.adj_list:
             adj_list_str += f'{v}: {self.adj_list[v]}\n'
         return vertices_str + arestas_str + adj_list_str
+    
+    def inverter_arestas(self):
+        self.adj_list_reverso = {v: [] for v in self.vertices}
+        for v in self.vertices:
+            for vizinho in self.adj_list[v]:
+                if isinstance(vizinho, tuple):  # Aresta ponderada
+                    self.adj_list_reverso[vizinho[0]].append(v)
+                else:  # Aresta não ponderada
+                    self.adj_list_reverso[vizinho].append(v)
 
 
 def ler_grafo_de_arquivo(filename):
     with open(filename, 'r') as file:
         data = file.read().strip()  # lê o arquivo e remove espaços em branco nas extremidades;
 
-    # padrões de vértices e arestas;
-    vertices_padrao = r'V = \{([a-z,]+)\};'
+    vertices_padrao = r'V = \{([a-zA-Z,]+)\};'
     arestas_padrao = r'A = \{(.+?)\};'
 
     # verificação de chaves de vértices e arestas;
@@ -59,13 +67,11 @@ def ler_grafo_de_arquivo(filename):
 
     vertices = vertices_match.group(1).split(',')
     arestas_verifica = arestas_match.group(1)
-    
-    # verificação de erros de parênteses e vírgulas nas arestas;
-    if not re.match(r'^\(\s*[a-z]\s*,\s*[a-z]\s*(?:,\s*-?\d+)?\s*\)(?:,\s*\(\s*[a-z]\s*,\s*[a-z]\s*(?:,\s*-?\d+)?\s*\))*$', arestas_verifica):
+
+    if not re.match(r'^\(\s*[a-zA-Z]\s*,\s*[a-zA-Z]\s*(?:,\s*-?\d+)?\s*\)(?:,\s*\(\s*[a-zA-Z]\s*,\s*[a-zA-Z]\s*(?:,\s*-?\d+)?\s*\))*$', arestas_verifica):
         raise ValueError("Erro de formatação em uma ou mais arestas.")
 
-    # encontrar todas as arestas válidas usando expressão regular;
-    arestas_list = re.findall(r'\(\s*([a-z]),\s*([a-z])(?:,\s*(-?\d+))?\s*\)', arestas_verifica)
+    arestas_list = re.findall(r'\(\s*([a-zA-Z]),\s*([a-zA-Z])(?:,\s*(-?\d+))?\s*\)', arestas_verifica)
 
     if not arestas_list:
         raise ValueError("Nenhuma aresta válida encontrada ou formato de arestas incorreto.")
