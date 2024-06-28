@@ -1,4 +1,4 @@
-from LereMontar.funcoesVerificar import quantVertices, quantArestas, Conexo, Bipartido, Euleriano, Hamiltoniano
+from LereMontar.funcoesVerificar import quantVertices, quantArestas, Conexo, Bipartido, Euleriano, Hamiltoniano, Cíclico, Planar
 
 def mostrar_menu():
     print("\nGrafo criado com sucesso! O que você deseja fazer agora?")
@@ -30,6 +30,10 @@ def processar_escolha(escolha, grafo):
         print(f"O grafo {Euleriano(grafo)}")
     elif escolha == 'f':
         print(f"O grafo {Hamiltoniano(grafo)}")
+    elif escolha == 'g':
+        print(f"O grafo {Cíclico(grafo)}")
+    elif escolha == 'h':
+        print(f"O grafo {Planar(grafo)}")
     else:
         print("Opção inválida. Por favor, escolha uma opção válida.")
 
