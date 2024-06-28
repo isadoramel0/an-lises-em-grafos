@@ -7,17 +7,17 @@ class Grafo:
         self.direcionado = direcionado
         self.adj_list = {v: [] for v in vertices}  
         # cria um dicionário com cada vértice como chave e uma lista vazia como valor;
-        
+               
         for (v1, v2, peso) in arestas:
-            if peso is not None:  # Grafo ponderado;
+            if peso is not None:  # Grafo ponderado
                 self.adj_list[v1].append((v2, peso))
                 if not self.direcionado:
-                    self.adj_list[v2].append((v1, peso))  # aresta bidirecional;
-            else:  # Grafo não ponderado;
+                    self.adj_list[v2].append((v1, peso))  # aresta bidirecional
+            else:  # Grafo não ponderado
                 self.adj_list[v1].append(v2)
                 if not self.direcionado:
-                    self.adj_list[v2].append(v1)  # aresta bidirecional;
-
+                    self.adj_list[v2].append(v1)  # aresta bidirecional
+                    
     def __repr__(self):
         vertices_str = f'Vertices: {self.vertices}\n'
         arestas_str = 'Arestas: ['
