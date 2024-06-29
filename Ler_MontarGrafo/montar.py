@@ -5,9 +5,8 @@ class Grafo:
         self.vertices = vertices
         self.arestas = arestas
         self.direcionado = direcionado
-        self.adj_list = {v: [] for v in vertices}  
-        # cria um dicionário com cada vértice como chave e uma lista vazia como valor;
-               
+        self.adj_list = {v: [] for v in vertices}
+        
         for (v1, v2, peso) in arestas:
             if peso is not None:  # Grafo ponderado
                 self.adj_list[v1].append((v2, peso))
@@ -40,9 +39,11 @@ class Grafo:
         for v in self.vertices:
             for vizinho in self.adj_list[v]:
                 if isinstance(vizinho, tuple):  # Aresta ponderada
-                    self.adj_list_reverso[vizinho[0]].append(v)
+                    self.adj_list_reverso[vizinho[0]].append((v, vizinho[1]))
                 else:  # Aresta não ponderada
                     self.adj_list_reverso[vizinho].append(v)
+
+        self.adj_list, self.adj_list_reverso = self.adj_list_reverso, self.adj_list
 
 
 def ler_grafo_de_arquivo(filename):
