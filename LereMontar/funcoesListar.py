@@ -236,3 +236,45 @@ def listarVerticesArticulacao(grafo):
         return "O grafo não possui vértices de articulação."
     else:
         return articulacoes
+    
+
+def listarArestasPonte(grafo):
+    vertices = grafo.vertices
+    visitados = {v: False for v in vertices}
+    descoberta = {v: float("inf") for v in vertices}
+    baixo = {v: float("inf") for v in vertices}
+    pai = {v: None for v in vertices}
+    tempo = [0]
+    pontes = []
+
+    def dfs(v):
+        visitados[v] = True
+        tempo[0] += 1
+        descoberta[v] = tempo[0]
+        baixo[v] = tempo[0]
+
+        for vizinho in grafo.adj_list[v]:
+            if isinstance(vizinho, tuple):
+                vizinho = vizinho[0]
+
+            if not visitados[vizinho]:
+                pai[vizinho] = v
+                dfs(vizinho)
+
+                baixo[v] = min(baixo[v], baixo[vizinho])
+
+                # Verifica se (v, vizinho) é uma ponte
+                if baixo[vizinho] > descoberta[v]:
+                    pontes.append((v, vizinho))
+
+            elif vizinho != pai[v]:
+                baixo[v] = min(baixo[v], descoberta[vizinho])
+
+    for v in vertices:
+        if not visitados[v]:
+            dfs(v)
+
+    if not pontes:
+        return "O grafo não possui arestas de ponte."
+    else:
+        return pontes
