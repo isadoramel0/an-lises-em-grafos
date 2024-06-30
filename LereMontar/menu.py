@@ -1,5 +1,5 @@
 from LereMontar.funcoesVerificar import quantVertices, quantArestas, Conexo, Bipartido, Euleriano, Hamiltoniano, Cíclico, Planar
-from LereMontar.funcoesListar import listarVertices, listarArestas, listarComponentesConexas, listarCaminhoEuleriano #, listarCaminhoHamiltoniano, listarVerticesArticulacao, listarArestasPonte
+from LereMontar.funcoesListar import listarVertices, listarArestas, listarComponentesConexas, listarCaminhoEuleriano, listarCaminhoHamiltoniano #, listarVerticesArticulacao, listarArestasPonte
 # from LereMontar.funcoesGerar import gerarMatrizAdjacencia, gerarListaAdjacencia, gerarArvoreProfundidade, gerarArvoreLargura, gerarArvoreGeradoraMinima, gerarOrdemTopologica, gerarCaminhoMinimo, gerarFluxoMaximo, gerarFechamentoTransitivo
 
 def mostrar_menu_principal():
