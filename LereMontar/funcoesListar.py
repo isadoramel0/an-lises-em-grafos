@@ -193,3 +193,46 @@ def listarCaminhoHamiltoniano(grafo):
             return caminho
 
     return "O grafo não tem um caminho Hamiltoniano."
+
+
+def listarVerticesArticulacao(grafo):
+    vertices = grafo.vertices
+    visitados = {v: False for v in vertices}
+    descoberta = {v: float("inf") for v in vertices}
+    baixo = {v: float("inf") for v in vertices}
+    pai = {v: None for v in vertices}
+    tempo = [0]
+    articulacoes = []
+
+    def dfs(v):
+        visitados[v] = True
+        tempo[0] += 1
+        descoberta[v] = tempo[0]
+        baixo[v] = tempo[0]
+        filhos = 0
+
+        for vizinho, peso in grafo.adj_list[v]:
+            if not visitados[vizinho]:
+                pai[vizinho] = v
+                filhos += 1
+                dfs(vizinho)
+
+                baixo[v] = min(baixo[v], baixo[vizinho])
+
+                # Verifica se v é articulação
+                if pai[v] is None and filhos > 1:
+                    articulacoes.append(v)
+                if pai[v] is not None and baixo[vizinho] >= descoberta[v]:
+                    articulacoes.append(v)
+
+            elif vizinho != pai[v]:
+                baixo[v] = min(baixo[v], descoberta[vizinho])
+
+    for v in vertices:
+        if not visitados[v]:
+            dfs(v)
+
+    if not articulacoes:
+        return "O grafo não possui vértices de articulação."
+    else:
+        return articulacoes
