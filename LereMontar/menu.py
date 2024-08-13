@@ -1,5 +1,5 @@
-from LereMontar.funcoesVerificar import quantVertices, quantArestas, Conexo, Bipartido, Euleriano, Hamiltoniano, Cíclico, Planar
-from LereMontar.funcoesListar import listarVertices, listarArestas, listarComponentesConexas, listarCaminhoEuleriano, listarCaminhoHamiltoniano, listarVerticesArticulacao, listarArestasPonte
+from LereMontar.funcoesVerificar import Conexo, Bipartido, Euleriano, Cíclico
+from LereMontar.funcoesListar import  listarComponentesConexas, listarCaminhoEuleriano, listarVerticesArticulacao, listarArestasPonte
 # from LereMontar.funcoesGerar import gerarMatrizAdjacencia, gerarListaAdjacencia, gerarArvoreProfundidade, gerarArvoreLargura, gerarArvoreGeradoraMinima, gerarOrdemTopologica, gerarCaminhoMinimo, gerarFluxoMaximo, gerarFechamentoTransitivo
 
 def mostrar_menu_principal():
@@ -11,14 +11,10 @@ def mostrar_menu_principal():
 
 def mostrar_menu_verificar():
     print("\nVerificar:")
-    print("a. Quantidade de vértices")
-    print("b. Quantidade de arestas")
-    print("c. Conexo")
-    print("d. Bipartido")
-    print("e. Euleriano")
-    print("f. Hamiltoniano")
-    print("g. Cíclico")
-    print("h. Planar")
+    print("a. Conexo")
+    print("b. Bipartido")
+    print("c. Euleriano")
+    print("d. Cíclico")
     print("0. Voltar ao menu principal")
 
 def mostrar_menu_listar():
@@ -70,21 +66,13 @@ def processar_escolha_principal(escolha, grafo):
 def processar_escolha_verificar(escolha, grafo):
     while escolha != '0':
         if escolha == 'a':
-            print(f"Quantidade de vértices: {quantVertices(grafo)}")
+            print(Conexo(grafo))
         elif escolha == 'b':
-            print(f"Quantidade de arestas: {quantArestas(grafo)}")
+            print(Bipartido(grafo))
         elif escolha == 'c':
-            print(f"O grafo {Conexo(grafo)} conexo")
+            print(Euleriano(grafo))
         elif escolha == 'd':
-            print(f"O grafo {Bipartido(grafo)}")
-        elif escolha == 'e':
-            print(f"O grafo {Euleriano(grafo)}")
-        elif escolha == 'f':
-            print(f"O grafo {Hamiltoniano(grafo)}")
-        elif escolha == 'g':
-            print(f"O grafo {Cíclico(grafo)}")
-        elif escolha == 'h':
-            print(f"O grafo {Planar(grafo)}")
+            print(Cíclico(grafo))
         else:
             print("Opção inválida. Por favor, escolha uma opção válida.")
         escolha = obter_escolha()
@@ -92,18 +80,14 @@ def processar_escolha_verificar(escolha, grafo):
 def processar_escolha_listar(escolha, grafo):
     while escolha != '0':
         if escolha == 'a':
-            print(f"Vértices: {listarVertices(grafo)}")
-        elif escolha == 'b':
-            print(f"Arestas: {listarArestas(grafo)}")
-        elif escolha == 'c':
             print(f"Componentes conexas: {listarComponentesConexas(grafo)}")
-        elif escolha == 'd':
+        elif escolha == 'b':
+            print(f"Componentes fortemente conexas: {listarComponentesConexas(grafo)}")
+        elif escolha == 'c':
             print(f"Caminho Euleriano: {listarCaminhoEuleriano(grafo)}")
-        elif escolha == 'e':
-            print(f"Caminho Hamiltoniano: {listarCaminhoHamiltoniano(grafo)}")
-        elif escolha == 'f':
+        elif escolha == 'd':
             print(f"Vértices de articulação: {listarVerticesArticulacao(grafo)}")
-        elif escolha == 'g':
+        elif escolha == 'e':
             print(f"Arestas ponte: {listarArestasPonte(grafo)}")
         else:
             print("Opção inválida. Por favor, escolha uma opção válida.")

@@ -1,155 +1,106 @@
+def dfs(grafo, v, tempo):
+    vertice = grafo.vertices[v]
+    vertice.cor = 'cinza'
+    tempo += 1
+    vertice.tempo_descoberta = tempo
 
-def quantVertices(grafo):
-    return len(grafo.vertices)
+    for vizinho in grafo.adj_list[v]:
+        if isinstance(vizinho, tuple):
+            vizinho = vizinho[0]
+        vizinho_obj = grafo.vertices[vizinho]
+        if vizinho_obj.cor == 'branco':
+            vizinho_obj.pai = v
+            tempo = dfs(grafo, vizinho, tempo)
 
-def quantArestas(grafo):
-    return len(grafo.arestas)
+    vertice.cor = 'preto'
+    tempo += 1
+    vertice.tempo_finalizacao = tempo
+
+    return tempo
+
 
 def Conexo(grafo):
-    def dfs(v, visited):
-        visited.add(v)
-        for vizinho in grafo.adj_list[v]:
-            if isinstance(vizinho, tuple): # Se o grafo for ponderado, vizinho será uma tupla (v2, peso)
-                vizinho = vizinho[0]
-            if vizinho not in visited:
-                dfs(vizinho, visited)
+    # Inicializa o tempo
+    tempo = 0
 
-    visited = set()
-    comecarVertice = next(iter(grafo.vertices))  # Começa a DFS a partir de um vértice qualquer
-    dfs(comecarVertice, visited)
-    
-    if len(visited) == len(grafo.vertices):
-        return "é"
+    # Inicializa as propriedades dos vértices
+    for vertice in grafo.vertices:
+        grafo.vertices[vertice].cor = 'branco'
+        grafo.vertices[vertice].pai = None
+        grafo.vertices[vertice].tempo_descoberta = None
+        grafo.vertices[vertice].tempo_finalizacao = None
+
+    # Escolhe um vértice arbitrário para começar a DFS
+    vertice_inicial = next(iter(grafo.vertices.keys()))
+
+    # Realiza a DFS a partir do vértice inicial
+    tempo = dfs(grafo, vertice_inicial, tempo)
+
+    # Verifica se todos os vértices foram alcançados
+    if all(grafo.vertices[vertice].cor == 'preto' for vertice in grafo.vertices):
+        return True
     else:
-        return "não é"
+        return False
+
 
 def Bipartido(grafo):
-    def dfs(v, cor, current_color):
-        cor[v] = current_color # Define a cor do vértice atual
+    def verificar_bipartido(grafo, v, visitado, cor, current_color):
+        cor[v] = current_color
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
                 vizinho = vizinho[0]
             if cor[vizinho] == -1:
-                if not dfs(vizinho, cor, 1 - current_color): # Inverte a cor
+                if not verificar_bipartido(grafo, vizinho, visitado, cor, 1 - current_color):
                     return False
             elif cor[vizinho] == cor[v]:
                 return False
         return True
 
-    cor = {v: -1 for v in grafo.vertices}  # Inicializa todas as cores como -1 (não colorido)
+    cor = {v: -1 for v in grafo.vertices}
 
     for vertice in grafo.vertices:
-        if cor[vertice] == -1:  
-            if not dfs(vertice, cor, 0 ):  # Inicia a DFS com a cor 0
-                return "não é bipartido"
+        if cor[vertice] == -1:
+            if not verificar_bipartido(grafo, vertice, set(), cor, 0):
+                return "0"
 
-    return "é bipartido"
+    return "1"
+
 
 def Euleriano(grafo):
     if Conexo(grafo) == "não é":
         return "não é euleriano"
-    else:
-        graus = {v: 0 for v in grafo.vertices} # Inicializa o dicionário de graus de cada vértice
-        for v in grafo.vertices:
-            for vizinho in grafo.adj_list[v]:
-                if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
-                graus[v] += 1 # Incrementa o grau do vértice
-        for v in graus:
-            if graus[v] % 2 != 0:
-                return "não é euleriano"
-        return "é euleriano"
-
-def Hamiltoniano(grafo):
-    if Conexo(grafo) == "não é":
-        return "não é hamiltoniano"
-    else:
-        if len(grafo.vertices) < 3:
-            return "não é hamiltoniano"
-        graus = {v: 0 for v in grafo.vertices} # Inicializa o dicionário de graus de cada vértice
-        for v in grafo.vertices:
-            for vizinho in grafo.adj_list[v]:
-                if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
-                graus[v] += 1 
-            if graus[v] < len(grafo.vertices) // 2: # Se o grau de um vértice for menor que a metade do número de vértices, não é hamiltoniano (TEOREMA DE DIRAC)
-                return "não é hamiltoniano"
-            else:
-                return "é hamiltoniano"
-            
-def Cíclico(grafo):
     
-    if grafo.direcionado:
-        visited = set()   # Marca o nó atual como visitado
-        rec_stack = set() # Adiciona o nó atual à pilha de recursão
-    
-        def dfs(v):
-            visited.add(v)
-            rec_stack.add(v)
-        
-            for vizinho in grafo.adj_list[v]:
-                if vizinho not in visited:
-                    if dfs(vizinho):
-                        return True
-                elif vizinho in rec_stack:
-                    return True
-        
-            rec_stack.remove(v)
-            return False
-    
-        for vertice in grafo.vertices:
-            if vertice not in visited:
-                if dfs(vertice):
-                    return "é cíclico"
-        return "não é cíclico"
-    
-    else:
-        visited = set()
-    
-        def dfs(v, parent):
-            visited.add(v)
-            for vizinho in grafo.adj_list[v]:
-                if vizinho not in visited:
-                    if dfs(vizinho, v):
-                        return True
-                elif parent != vizinho:
-                    return True
-            return False
-    
-    for vertice in grafo.vertices:
-        if vertice not in visited:
-            if dfs(vertice, None):
-                return "é cíclico"
-    return "não é cíclico"
-
-import networkx as nx
-def converter_para_networkx(grafo):
-    G = nx.Graph()
-    for v in grafo.adj_list:
+    graus = {v: 0 for v in grafo.vertices}
+    for v in grafo.vertices:
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
-                G.add_edge(v, vizinho[0], weight=vizinho[1])  # Para grafos ponderados
-            else:
-                G.add_edge(v, vizinho)  # Para grafos não ponderados
-    return G
+                vizinho = vizinho[0]
+            graus[v] += 1
 
-def VerificaPlanar(grafo):
-    # Verifica se o grafo é planar
-    G = converter_para_networkx(grafo)
-    planar = nx.check_planarity(G)
-    return planar
+    for v in graus:
+        if graus[v] % 2 != 0:
+            return "0"
     
-def Planar(grafo):
-    if VerificaPlanar(grafo):
-        return "é planar"
-    else:
-        return "não é planar"
+    return "1"
 
 
-        
+def Cíclico(grafo):
+    def verificar_ciclo(grafo, v, visitado, pai):
+        visitado.add(v)
+        for vizinho in grafo.adj_list[v]:
+            if isinstance(vizinho, tuple):
+                vizinho = vizinho[0]
+            if vizinho not in visitado:
+                if verificar_ciclo(grafo, vizinho, visitado, v):
+                    return True
+            elif vizinho != pai:
+                return True
+        return False
 
-
-
-
-        
+    visitado = set()
     
+    for vertice in grafo.vertices:
+        if vertice not in visitado:
+            if verificar_ciclo(grafo, vertice, visitado, None):
+                return "1"
+    return "0"

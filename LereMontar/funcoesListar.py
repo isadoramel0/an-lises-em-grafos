@@ -1,22 +1,3 @@
-def listarVertices(grafo):
-    return list(grafo.vertices)
-
-
-def listarArestas(grafo):
-    arestas = '['
-    for i, (v1, v2, peso) in enumerate(grafo.arestas):
-        if peso is not None:
-            arestas += f'({v1}, {v2}, {peso})'
-        else:
-            arestas += f'({v1}, {v2})'
-        
-        if i < len(grafo.arestas) - 1:
-            arestas += ', '
-        
-    arestas += ']\n'
-    return arestas
-
-
 def listarComponentesConexas(grafo):
     componentes = []
     visitados = set()
@@ -162,38 +143,6 @@ def listarCaminhoEuleriano(grafo):
         elif tipo_caminho == "Semi-Euleriano":
             return "Caminho Semi-Euleriano: " + str(caminho[::-1])
         
-
-def listarCaminhoHamiltoniano(grafo):
-    n = len(grafo.vertices)
-    
-    def backtrack(v, caminho, visitados):
-        if len(caminho) == n:
-            if caminho[0] in [vizinho if not isinstance(vizinho, tuple) else vizinho[0] for vizinho in grafo.adj_list[v]]:
-                caminho.append(caminho[0])
-                return True
-            else:
-                return False
-
-        for vizinho in grafo.adj_list[v]:
-            if isinstance(vizinho, tuple):
-                vizinho = vizinho[0]
-            if vizinho not in visitados:
-                visitados.add(vizinho)
-                caminho.append(vizinho)
-                if backtrack(vizinho, caminho, visitados):
-                    return True
-                visitados.remove(vizinho)
-                caminho.pop()
-        return False
-
-    for start in grafo.vertices:
-        caminho = [start]
-        visitados = set([start])
-        if backtrack(start, caminho, visitados):
-            return caminho
-
-    return "O grafo não tem um caminho Hamiltoniano."
-
 
 def listarVerticesArticulacao(grafo):
     vertices = grafo.vertices
