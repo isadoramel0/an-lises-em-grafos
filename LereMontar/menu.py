@@ -1,5 +1,5 @@
 from LereMontar.funcoesVerificar import Conexo, Bipartido, Euleriano, Cíclico
-from LereMontar.funcoesListar import  listarComponentesConexas, listarCaminhoEuleriano, listarVerticesArticulacao, listarArestasPonte
+from LereMontar.funcoesListar import  listarComponentesConexas, listarCaminhoEuleriano, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima
 # from LereMontar.funcoesGerar import gerarMatrizAdjacencia, gerarListaAdjacencia, gerarArvoreProfundidade, gerarArvoreLargura, gerarArvoreGeradoraMinima, gerarOrdemTopologica, gerarCaminhoMinimo, gerarFluxoMaximo, gerarFechamentoTransitivo
 
 def mostrar_menu_principal():
@@ -96,13 +96,13 @@ def processar_escolha_listar(escolha, grafo):
 def processar_escolha_gerar(escolha, grafo):
     while escolha != '0':
         if escolha == 'a':
-            print(f"Matriz de adjacência: {gerarMatrizAdjacencia(grafo)}")
+            print(f"Árvore de Profundidade partindo do vértice 0: {arvore_lexicografica(grafo)}")
         elif escolha == 'b':
-            print(f"Lista de adjacência: {gerarListaAdjacencia(grafo)}")
+            print(f"Árvore de Largura partindo do vértice 0: {arvore_largura(grafo)}")
         elif escolha == 'c':
-            print(f"Árvore de profundidade: {gerarArvoreProfundidade(grafo)}")
+            print(f"Árvore geradora mínima: {arvore_geradora_minima(grafo)}")
         elif escolha == 'd':
-            print(f"Árvore de largura: {gerarArvoreLargura(grafo)}")
+            print(f"Ordenação Topológica: {gerarArvoreLargura(grafo)}")
         elif escolha == 'e':
             print(f"Árvore geradora mínima: {gerarArvoreGeradoraMinima(grafo)}")
         elif escolha == 'f':
