@@ -1,16 +1,16 @@
-def dfs(grafo, v, tempo):
+def DFS(grafo, v, tempo, adj_list):
     vertice = grafo.vertices[v]
     vertice.cor = 'cinza'
     tempo += 1
     vertice.tempo_descoberta = tempo
 
-    for vizinho in grafo.adj_list[v]:
+    for vizinho in adj_list[v]:
         if isinstance(vizinho, tuple):
             vizinho = vizinho[0]
         vizinho_obj = grafo.vertices[vizinho]
         if vizinho_obj.cor == 'branco':
             vizinho_obj.pai = v
-            tempo = dfs(grafo, vizinho, tempo)
+            tempo = DFS(grafo, vizinho, tempo, adj_list)
 
     vertice.cor = 'preto'
     tempo += 1
@@ -18,29 +18,33 @@ def dfs(grafo, v, tempo):
 
     return tempo
 
-
 def Conexo(grafo):
-    # Inicializa o tempo
+    # Se o grafo é direcionado, criamos uma lista de adjacência temporária com arestas bidirecionais
+    if grafo.direcionado:
+        adj_list_temporaria = {v: [] for v in grafo.vertices}
+        for v in grafo.adj_list:
+            for vizinho in grafo.adj_list[v]:
+                if isinstance(vizinho, tuple):
+                    adj_list_temporaria[v].append(vizinho)
+                    adj_list_temporaria[vizinho[0]].append((v, vizinho[1]))
+                else:
+                    adj_list_temporaria[v].append(vizinho)
+                    adj_list_temporaria[vizinho].append(v)
+    else:
+        adj_list_temporaria = grafo.adj_list
+
+    # Escolhe o primeiro vértice da lista de vértices para começar a DFS
+    vertice_inicial = list(grafo.vertices.keys())[0]
+
+    # Realiza a DFS a partir do vértice inicial usando a lista de adjacência apropriada
     tempo = 0
-
-    # Inicializa as propriedades dos vértices
-    for vertice in grafo.vertices:
-        grafo.vertices[vertice].cor = 'branco'
-        grafo.vertices[vertice].pai = None
-        grafo.vertices[vertice].tempo_descoberta = None
-        grafo.vertices[vertice].tempo_finalizacao = None
-
-    # Escolhe um vértice arbitrário para começar a DFS
-    vertice_inicial = next(iter(grafo.vertices.keys()))
-
-    # Realiza a DFS a partir do vértice inicial
-    tempo = dfs(grafo, vertice_inicial, tempo)
+    DFS(grafo, vertice_inicial, tempo, adj_list_temporaria)
 
     # Verifica se todos os vértices foram alcançados
-    if all(grafo.vertices[vertice].cor == 'preto' for vertice in grafo.vertices):
-        return True
+    if (all(grafo.vertices[vertice].cor == 'preto' for vertice in grafo.vertices)):
+        return 1
     else:
-        return False
+        return 0
 
 
 def Bipartido(grafo):
