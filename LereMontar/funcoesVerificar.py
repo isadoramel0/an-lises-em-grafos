@@ -67,21 +67,44 @@ def Bipartido(grafo):
 
 
 def Euleriano(grafo):
-    if Conexo(grafo) == "não é":
+    if not Conexo(grafo):
         return "não é euleriano"
     
-    graus = {v: 0 for v in grafo.vertices}
-    for v in grafo.vertices:
-        for vizinho in grafo.adj_list[v]:
-            if isinstance(vizinho, tuple):
-                vizinho = vizinho[0]
-            graus[v] += 1
+    if grafo.direcionado:
+        # Verifique se o grafo direcionado é euleriano
+        grau_entrada = {v: 0 for v in grafo.vertices}
+        grau_saida = {v: 0 for v in grafo.vertices}
+        
+        for v in grafo.vertices:
+            for vizinho in grafo.adj_list[v]:
+                if isinstance(vizinho, tuple):
+                    vizinho = vizinho[0]
+                grau_saida[v] += 1
+                grau_entrada[vizinho] += 1
+        
+        # Verifique se os graus de entrada e saída são iguais para todos os vértices
+        for v in grafo.vertices:
+            if grau_entrada[v] != grau_saida[v]:
+                return "0"
+            
+        return "1"
 
-    for v in graus:
-        if graus[v] % 2 != 0:
-            return "0"
-    
-    return "1"
+    else:
+        # Verifique se o grafo não direcionado é euleriano
+        grau = {v: 0 for v in grafo.vertices}
+        
+        for v in grafo.vertices:
+            for vizinho in grafo.adj_list[v]:
+                if isinstance(vizinho, tuple):
+                    vizinho = vizinho[0]
+                grau[v] += 1
+        
+        # Verifique se o grau de todos os vértices é par
+        for v in grafo.vertices:
+            if grau[v] % 2 != 0:
+                return "0"
+            
+        return "1"
 
 
 def Cíclico(grafo):
