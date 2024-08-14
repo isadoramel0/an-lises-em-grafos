@@ -6,17 +6,21 @@ def DFS(grafo, v, tempo, adj_list):
 
     for vizinho in adj_list[v]:
         if isinstance(vizinho, tuple):
-            vizinho = vizinho[0]
-        vizinho_obj = grafo.vertices[vizinho]
+            vizinho_id = vizinho[1]  # Acessa o vértice destino na tupla (idAresta, vizinho, peso)
+        else:
+            vizinho_id = vizinho
+
+        vizinho_obj = grafo.vertices[vizinho_id]
         if vizinho_obj.cor == 'branco':
             vizinho_obj.pai = v
-            tempo = DFS(grafo, vizinho, tempo, adj_list)
+            tempo = DFS(grafo, vizinho_id, tempo, adj_list)
 
     vertice.cor = 'preto'
     tempo += 1
     vertice.tempo_finalizacao = tempo
 
     return tempo
+
 
 def Conexo(grafo):
     # Se o grafo é direcionado, criamos uma lista de adjacência temporária com arestas bidirecionais
@@ -131,3 +135,5 @@ def Cíclico(grafo):
             if verificar_ciclo(grafo, vertice, visitado, None):
                 return "1"
     return "0"
+
+

@@ -30,15 +30,13 @@ def mostrar_menu_listar():
 
 def mostrar_menu_gerar():
     print("\nGerar:")
-    print("a. Matriz de adjacência")
-    print("b. Lista de adjacência")
-    print("c. Árvore de profundidade")
-    print("d. Árvore de largura")
-    print("e. Árvore geradora mínima")
-    print("f. Ordem topológica")
-    print("g. Caminho mínimo entre dois vértices")
-    print("h. Fluxo máximo")
-    print("i. Fechamento transitivo")
+    print("a. Árvore de profundidade")
+    print("b. Árvore de largura")
+    print("c. Árvore geradora mínima")
+    print("d. Ordenação topológica")
+    print("e. Caminho mínimo entre dois vérƟces")
+    print("f. Fluxo máximo ")
+    print("g. Fecho transitivo")
     print("0. Voltar ao menu principal")
 
 def obter_escolha():

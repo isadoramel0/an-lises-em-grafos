@@ -98,5 +98,5 @@ if __name__ == "__main__":
         
     except ValueError as e:
         print(f"Erro: {e}")  # erro no caso de formato inválido;
-    except Exception as e:
-        print(f"Erro inesperado: {e}")  # para capturar qualquer outro erro inesperado.
+    ##except Exception as e:
+        #print(f"Erro inesperado: {e}")  # para capturar qualquer outro erro inesperado.

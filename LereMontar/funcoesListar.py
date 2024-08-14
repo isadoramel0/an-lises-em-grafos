@@ -188,6 +188,7 @@ def listarVerticesArticulacao(grafo):
     
 
 def listarArestasPonte(grafo):
+    # Inicializa os dicionários
     vertices = grafo.vertices
     visitados = {v: False for v in vertices}
     descoberta = {v: float("inf") for v in vertices}
@@ -195,7 +196,7 @@ def listarArestasPonte(grafo):
     pai = {v: None for v in vertices}
     tempo = [0]
     pontes = []
-
+    # Função de busca em profundidade com Algoritmo de Tarjan
     def dfs(v):
         visitados[v] = True
         tempo[0] += 1
@@ -227,3 +228,75 @@ def listarArestasPonte(grafo):
         return "O grafo não possui arestas de ponte."
     else:
         return pontes
+
+def dfs_lexicografica(v, grafo, visitados, arestas_usadas):
+    visitados[v] = True
+    for aresta in sorted(grafo.adj_list[v], key=lambda x: (x[1], x[0])):  # Ordena por vizinho e id_aresta
+        id_aresta, vizinho = aresta[0], aresta[1]
+        
+        if not visitados[vizinho]:
+            arestas_usadas.append(id_aresta)  # Adiciona o identificador da aresta
+            dfs_lexicografica(vizinho, grafo, visitados, arestas_usadas)
+
+def arvore_lexicografica(grafo):
+    visitados = {v: False for v in grafo.vertices}
+    arestas_usadas = []
+    dfs_lexicografica(0, grafo, visitados, arestas_usadas)
+    return arestas_usadas
+
+from collections import deque
+
+def bfs_lexicografica(v, grafo):
+    visitados = {v: False for v in grafo.vertices}
+    arestas_usadas = []
+    fila = deque([v])
+    visitados[v] = True
+
+    while fila:
+        atual = fila.popleft()
+        for aresta in sorted(grafo.adj_list[atual], key=lambda x: (x[1])):  # Ordena os vizinhos por ordem lexicográfica
+            id_aresta, vizinho, *peso = aresta
+            
+            if not visitados[vizinho]:
+                visitados[vizinho] = True
+                fila.append(vizinho)
+                arestas_usadas.append(id_aresta)
+
+    return arestas_usadas
+
+def arvore_largura(grafo):
+    if 0 not in grafo.vertices:
+        return []  # Se não há vértice 0 no grafo, não pode gerar a árvore de largura
+    
+    return bfs_lexicografica(0, grafo)
+
+import heapq
+# Algoritmo de Prim para árvore geradora mínima
+def prim_lexicografico(grafo):
+    visitados = {v: False for v in grafo.vertices}
+    mst = []
+    min_heap = []
+    inicial = 0
+
+    visitados[inicial] = True
+    for aresta in grafo.adj_list[inicial]:
+        id_aresta, vizinho, peso = aresta
+        heapq.heappush(min_heap, (peso, id_aresta, inicial, vizinho))
+
+    while min_heap:
+        peso, id_aresta, u, v = heapq.heappop(min_heap)
+        if not visitados[v]:
+            visitados[v] = True
+            mst.append(id_aresta)
+
+            for aresta in grafo.adj_list[v]:
+                id_aresta, vizinho, peso = aresta
+                if not visitados[vizinho]:
+                    heapq.heappush(min_heap, (peso, id_aresta, v, vizinho))
+
+    return mst
+
+def arvore_geradora_minima(grafo):
+    if len(grafo.arestas) == 0:
+        return []  # Não há arestas para gerar uma árvore
+    return prim_lexicografico(grafo)
