@@ -15,15 +15,15 @@ class Grafo:
         self.direcionado = direcionado
         self.adj_list = {v: [] for v in vertices}
         
-        for (v1, v2, peso) in arestas:
+        for (idAresta, v1, v2, peso) in arestas:
             if peso is not None:  # Grafo ponderado
-                self.adj_list[v1].append((v2, peso))
+                self.adj_list[v1].append((idAresta, v2, peso))
                 if not self.direcionado:
-                    self.adj_list[v2].append((v1, peso))  # Aresta bidirecional
+                    self.adj_list[v2].append((idAresta, v1, peso))  # Aresta bidirecional
             else:  # Grafo não ponderado
-                self.adj_list[v1].append(v2)
+                self.adj_list[v1].append(idAresta, v2)
                 if not self.direcionado:
-                    self.adj_list[v2].append(v1)  # Aresta bidirecional
+                    self.adj_list[v2].append(idAresta, v1)  # Aresta bidirecional
 
     def __repr__(self):
         vertices_str = 'Vertices: ('
@@ -32,11 +32,11 @@ class Grafo:
         vertices_str += ')\n'
 
         arestas_str = 'Arestas: ['
-        for i, (v1, v2, peso) in enumerate(self.arestas):
+        for i, (id_aresta, v1, v2, peso) in enumerate(self.arestas):
             if peso is not None:
-                arestas_str += f'({v1}, {v2}, {peso})'
+                arestas_str += f'({id_aresta}, {v1}, {v2}, {peso})'
             else:
-                arestas_str += f'({v1}, {v2})'
+                arestas_str += f'({id_aresta}, {v1}, {v2})'
             if i < len(self.arestas) - 1:
                 arestas_str += ', '
         arestas_str += ']\n'
@@ -78,7 +78,7 @@ def ler_grafo():
 
         if v1 not in vertices or v2 not in vertices:
             raise ValueError(f"Aresta referencia vértices fora do intervalo permitido: ({v1}, {v2})")
-        arestas.append((v1, v2, peso))
+        arestas.append((id_aresta, v1, v2, peso))
     
     return Grafo(vertices, arestas, direcionado)
 
