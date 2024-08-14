@@ -1,60 +1,92 @@
-def listarComponentesConexas(grafo):
+def DFS(grafo, v, tempo, adj_list):
+    vertice = grafo.vertices[v]
+    vertice.cor = 'cinza'
+    tempo += 1
+    vertice.tempo_descoberta = tempo
+
+    for vizinho in adj_list[v]:
+        if isinstance(vizinho, tuple):
+            vizinho_id = vizinho[1]  # Acessa o vértice destino na tupla (idAresta, vizinho, peso)
+        else:
+            vizinho_id = vizinho
+
+        vizinho_obj = grafo.vertices[vizinho_id]
+        if vizinho_obj.cor == 'branco':
+            vizinho_obj.pai = v
+            tempo = DFS(grafo, vizinho_id, tempo, adj_list)
+
+    vertice.cor = 'preto'
+    tempo += 1
+    vertice.tempo_finalizacao = tempo
+
+    return tempo
+
+
+def ComponentesConexas(grafo):
+    if grafo.direcionado:
+        return -1
+    
     componentes = []
     visitados = set()
 
-    if grafo.direcionado:
-        # Algoritmo de Kosaraju para componentes fortemente conexas
-        def dfs(v, stack):
+    def dfs_componente(v, componente_atual):
+        visitados.add(v)
+        componente_atual.append(v)
+        for vizinho in grafo.adj_list[v]:
+            if isinstance(vizinho, tuple):  # Arestas como tuplas
+                vizinho = vizinho[1]  # Seleciona apenas o vértice de destino
+            if vizinho not in visitados:
+                dfs_componente(vizinho, componente_atual)
+
+    for vertice in grafo.vertices:
+        if vertice not in visitados:
+            componente_atual = []
+            dfs_componente(vertice, componente_atual)
+            componentes.append(sorted(componente_atual))  # Ordena para garantir a ordem correta
+
+    return componentes
+
+
+def ComponentesFortementeConexas(grafo):
+    if not grafo.direcionado:
+        return -1
+
+    componentes = []
+    visitados = set()
+    stack = []
+
+    # Usando sua função DFS para a primeira passagem
+    def dfs_primeira_passagem(v):
+        if v not in visitados:
             visitados.add(v)
-            for vizinho in grafo.adj_list[v]:
-                if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
-                if vizinho not in visitados:
-                    dfs(vizinho, stack)
+            tempo = 0
+            tempo = DFS(grafo, v, tempo, grafo.adj_list)  # Usa DFS para marcar tempos de finalização
             stack.append(v)
 
-        def dfs_invertido(v, componente_atual):
-            visitados.add(v)
-            componente_atual.append(v)
-            for vizinho in grafo.adj_list[v]:
-                if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
-                if vizinho not in visitados:
-                    dfs_invertido(vizinho, componente_atual)
+    # Primeira passagem: Preencher a pilha com a ordem de finalização dos vértices
+    for vertice in grafo.vertices:
+        if vertice not in visitados:
+            dfs_primeira_passagem(vertice)
 
-        stack = []
-        for vertice in grafo.vertices:
-            if vertice not in visitados:
-                dfs(vertice, stack)
+    # Inverter as arestas do grafo
+    grafo.inverter_arestas()
+    visitados.clear()
 
-        grafo.inverter_arestas()
-        visitados.clear()
+    # Segunda passagem: DFS na ordem inversa dos tempos de finalização para encontrar componentes
+    while stack:
+        v = stack.pop()
+        if v not in visitados:
+            componente_atual = []
+            tempo = 0
+            tempo = DFS(grafo, v, tempo, grafo.adj_list)  # Usa DFS para marcar os componentes
+            for u in grafo.vertices:
+                if grafo.vertices[u].cor == 'preto' and u not in visitados:
+                    componente_atual.append(u)
+                    visitados.add(u)
+            componentes.append(componente_atual)
 
-        while stack:
-            v = stack.pop()
-            if v not in visitados:
-                componente_atual = []
-                dfs_invertido(v, componente_atual)
-                componentes.append(componente_atual)
-
-        grafo.inverter_arestas()
-
-    else:
-        # Componentes conexas para grafos não direcionados
-        def dfs(v, componente_atual):
-            visitados.add(v)
-            componente_atual.append(v)
-            for vizinho in grafo.adj_list[v]:
-                if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
-                if vizinho not in visitados:
-                    dfs(vizinho, componente_atual)
-
-        for vertice in grafo.vertices:
-            if vertice not in visitados:
-                componente_atual = []
-                dfs(vertice, componente_atual)
-                componentes.append(componente_atual)
+    # Reverter a inversão das arestas para restaurar o grafo original
+    grafo.inverter_arestas()
 
     return componentes
 

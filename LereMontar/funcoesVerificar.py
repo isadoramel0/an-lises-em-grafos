@@ -76,7 +76,7 @@ def Bipartido(grafo):
 
 def Euleriano(grafo):
     if not Conexo(grafo):
-        return "não é euleriano"
+        return "0"
     
     if grafo.direcionado:
         # Verifique se o grafo direcionado é euleriano
