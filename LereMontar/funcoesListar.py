@@ -22,6 +22,7 @@ def DFS(grafo, v, tempo, adj_list):
     return tempo
 
 
+# ------- Componentes Conexas
 def ComponentesConexas(grafo):
     if grafo.direcionado:
         return -1
@@ -47,6 +48,7 @@ def ComponentesConexas(grafo):
     return componentes
 
 
+# ------- Componentes Fortemente Conexas
 def ComponentesFortementeConexas(grafo):
     if not grafo.direcionado:
         return -1
@@ -89,6 +91,7 @@ def ComponentesFortementeConexas(grafo):
     grafo.inverter_arestas()
 
     return componentes
+
 
 
 def listarCaminhoEuleriano(grafo):
@@ -332,3 +335,45 @@ def arvore_geradora_minima(grafo):
     if len(grafo.arestas) == 0:
         return []  # Não há arestas para gerar uma árvore
     return prim_lexicografico(grafo)
+
+from collections import defaultdict
+
+def ordem_topologica(grafo):
+    # Verifica se o grafo é direcionado
+    if grafo.direcionado == False:
+        return -1
+
+    adj_list = grafo.adj_list
+    pilha = []
+    visitado = set()
+
+    def dfs_pilha(grafo, v, tempo, adj_list, visitado, pilha):
+        vertice = grafo.vertices[v]
+        vertice.cor = 'cinza'
+        tempo += 1
+        vertice.tempo_descoberta = tempo
+
+        for vizinho in adj_list[v]:
+            if isinstance(vizinho, tuple):
+                vizinho_id = vizinho[1]  # Acessa o vértice destino na tupla (idAresta, vizinho, peso)
+            else:
+                vizinho_id = vizinho
+
+            if vizinho_id not in visitado:
+                visitado.add(vizinho_id)
+                tempo = dfs_pilha(grafo, vizinho_id, tempo, adj_list, visitado, pilha)
+
+        vertice.cor = 'preto'
+        tempo += 1
+        vertice.tempo_finalizacao = tempo
+
+        pilha.append(v)
+        return tempo
+
+    for vertice in grafo.vertices:
+        if vertice not in visitado:
+            visitado.add(vertice)
+            dfs_pilha(grafo, vertice, 0, adj_list, visitado, pilha)
+
+    # A pilha contém os vértices na ordem inversa da ordem topológica
+    return pilha[::-1]
