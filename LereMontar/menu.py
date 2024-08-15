@@ -1,6 +1,6 @@
 from LereMontar.funcoesVerificar import Conexo, Bipartido, Euleriano, Cíclico
-from LereMontar.funcoesListar import  listarComponentesConexas, listarCaminhoEuleriano, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima
-# from LereMontar.funcoesGerar import gerarMatrizAdjacencia, gerarListaAdjacencia, gerarArvoreProfundidade, gerarArvoreLargura, gerarArvoreGeradoraMinima, gerarOrdemTopologica, gerarCaminhoMinimo, gerarFluxoMaximo, gerarFechamentoTransitivo
+from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima, ordem_topologica
+
 
 def mostrar_menu_principal():
     print("\nGrafo criado com sucesso! O que você deseja fazer agora?")
@@ -14,18 +14,16 @@ def mostrar_menu_verificar():
     print("a. Conexo")
     print("b. Bipartido")
     print("c. Euleriano")
-    print("d. Cíclico")
+    print("d. Possui ciclo")
     print("0. Voltar ao menu principal")
 
 def mostrar_menu_listar():
     print("\nListar:")
-    print("a. Vértices")
-    print("b. Arestas")
-    print("c. Componentes conexas")
-    print("d. Um caminho Euleriano")
-    print("e. Um caminho Hamiltoniano")
-    print("f. Vértices de articulação")
-    print("g. Arestas ponte")
+    print("a. Componentes conexas")
+    print("b. Componentes fortemente conexas")
+    print("c. Uma trilha Euleriana")
+    print("d. Vértices de articulação")
+    print("e. Arestas ponte")
     print("0. Voltar ao menu principal")
 
 def mostrar_menu_gerar():
@@ -34,8 +32,8 @@ def mostrar_menu_gerar():
     print("b. Árvore de largura")
     print("c. Árvore geradora mínima")
     print("d. Ordenação topológica")
-    print("e. Caminho mínimo entre dois vérƟces")
-    print("f. Fluxo máximo ")
+    print("e. Valor do caminho mínimo entre dois vérƟces")
+    print("f. Valor do fluxo máximo")
     print("g. Fecho transitivo")
     print("0. Voltar ao menu principal")
 
@@ -78,11 +76,11 @@ def processar_escolha_verificar(escolha, grafo):
 def processar_escolha_listar(escolha, grafo):
     while escolha != '0':
         if escolha == 'a':
-            print(f"Componentes conexas: {listarComponentesConexas(grafo)}")
+            print(ComponentesConexas(grafo))
         elif escolha == 'b':
-            print(f"Componentes fortemente conexas: {listarComponentesConexas(grafo)}")
+            print(ComponentesFortementeConexas(grafo))
         elif escolha == 'c':
-            print(f"Caminho Euleriano: {listarCaminhoEuleriano(grafo)}")
+            print(encontrar_trilha_euleriana(grafo))
         elif escolha == 'd':
             print(f"Vértices de articulação: {listarVerticesArticulacao(grafo)}")
         elif escolha == 'e':
@@ -100,7 +98,7 @@ def processar_escolha_gerar(escolha, grafo):
         elif escolha == 'c':
             print(f"Árvore geradora mínima: {arvore_geradora_minima(grafo)}")
         elif escolha == 'd':
-            print(f"Ordenação Topológica: {gerarArvoreLargura(grafo)}")
+            print(ordem_topologica(grafo))
         elif escolha == 'e':
             print(f"Árvore geradora mínima: {gerarArvoreGeradoraMinima(grafo)}")
         elif escolha == 'f':

@@ -22,6 +22,7 @@ def DFS(grafo, v, tempo, adj_list):
     return tempo
 
 
+# ------- Conexo
 def Conexo(grafo):
     # Se o grafo é direcionado, criamos uma lista de adjacência temporária com arestas bidirecionais
     if grafo.direcionado:
@@ -51,6 +52,7 @@ def Conexo(grafo):
         return 0
 
 
+# ------- Bipartido
 def Bipartido(grafo):
     def verificar_bipartido(grafo, v, visitado, cor, current_color):
         cor[v] = current_color
@@ -74,9 +76,10 @@ def Bipartido(grafo):
     return "1"
 
 
+# ------- Euleriano
 def Euleriano(grafo):
     if not Conexo(grafo):
-        return "não é euleriano"
+        return "0"
     
     if grafo.direcionado:
         # Verifique se o grafo direcionado é euleriano
@@ -115,6 +118,7 @@ def Euleriano(grafo):
         return "1"
 
 
+# ------- Procura ciclo
 def Cíclico(grafo):
     def verificar_ciclo(grafo, v, visitado, pai):
         visitado.add(v)
@@ -135,5 +139,3 @@ def Cíclico(grafo):
             if verificar_ciclo(grafo, vertice, visitado, None):
                 return "1"
     return "0"
-
-
