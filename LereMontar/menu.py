@@ -1,5 +1,5 @@
 from LereMontar.funcoesVerificar import Conexo, Bipartido, Euleriano, Cíclico
-from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima, ordem_topologica
+from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, encontrar_vertices_articulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, listarCaminhoEuleriano, arvore_geradora_minima, ordem_topologica, caminho_minimo, valor_fluxo_maximo, fecho_transitivo
 
 
 def mostrar_menu_principal():
@@ -80,9 +80,9 @@ def processar_escolha_listar(escolha, grafo):
         elif escolha == 'b':
             print(ComponentesFortementeConexas(grafo))
         elif escolha == 'c':
-            print(encontrar_trilha_euleriana(grafo))
+            print(listarCaminhoEuleriano(grafo))
         elif escolha == 'd':
-            print(f"Vértices de articulação: {listarVerticesArticulacao(grafo)}")
+            print(encontrar_vertices_articulacao(grafo))
         elif escolha == 'e':
             print(f"Arestas ponte: {listarArestasPonte(grafo)}")
         else:
@@ -92,23 +92,19 @@ def processar_escolha_listar(escolha, grafo):
 def processar_escolha_gerar(escolha, grafo):
     while escolha != '0':
         if escolha == 'a':
-            print(f"Árvore de Profundidade partindo do vértice 0: {arvore_lexicografica(grafo)}")
+            print(arvore_lexicografica(grafo))
         elif escolha == 'b':
-            print(f"Árvore de Largura partindo do vértice 0: {arvore_largura(grafo)}")
+            print(arvore_largura(grafo))
         elif escolha == 'c':
-            print(f"Árvore geradora mínima: {arvore_geradora_minima(grafo)}")
+            print(arvore_geradora_minima(grafo))
         elif escolha == 'd':
             print(ordem_topologica(grafo))
         elif escolha == 'e':
-            print(f"Árvore geradora mínima: {gerarArvoreGeradoraMinima(grafo)}")
+            print(caminho_minimo(grafo))
         elif escolha == 'f':
-            print(f"Ordem topológica: {gerarOrdemTopologica(grafo)}")
+            print(valor_fluxo_maximo(grafo, 0, (len(grafo.vertices) - 1)))
         elif escolha == 'g':
-            print(f"Caminho mínimo entre dois vértices: {gerarCaminhoMinimo(grafo)}")
-        elif escolha == 'h':
-            print(f"Fluxo máximo: {gerarFluxoMaximo(grafo)}")
-        elif escolha == 'i':
-            print(f"Fechamento transitivo: {gerarFechamentoTransitivo(grafo)}")
+            print(fecho_transitivo(grafo))
         else:
             print("Opção inválida. Por favor, escolha uma opção válida.")
         escolha = obter_escolha()

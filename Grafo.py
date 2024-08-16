@@ -51,7 +51,7 @@ class Grafo:
         for v in self.vertices:
             for vizinho in self.adj_list[v]:
                 if isinstance(vizinho, tuple):  # Aresta ponderada
-                    self.adj_list_reverso[vizinho[0]].append((v, vizinho[1]))
+                    self.adj_list_reverso[vizinho[1]].append((v, vizinho[2]))
                 else:  # Aresta não ponderada
                     self.adj_list_reverso[vizinho].append(v)
 

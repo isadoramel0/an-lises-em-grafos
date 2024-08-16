@@ -45,53 +45,65 @@ def ComponentesConexas(grafo):
             dfs_componente(vertice, componente_atual)
             componentes.append(sorted(componente_atual))  # Ordena para garantir a ordem correta
 
-    return componentes
+    return len(componentes)
 
 
 # ------- Componentes Fortemente Conexas
+
 def ComponentesFortementeConexas(grafo):
     if not grafo.direcionado:
         return -1
 
-    componentes = []
-    visitados = set()
+    def dfs_primeira_passagem(v, visitados, stack):
+        visitados.add(v)
+        for item in grafo.adj_list.get(v, []):
+            vizinho = item[1] if isinstance(item, tuple) else item
+            if vizinho not in visitados:
+                dfs_primeira_passagem(vizinho, visitados, stack)
+        stack.append(v)
+
+    def dfs_segunda_passagem(v, visitados, componente_atual):
+        visitados.add(v)
+        componente_atual.append(v)
+        for item in grafo.adj_list.get(v, []):
+            vizinho = item[1] if isinstance(item, tuple) else item
+            if vizinho not in visitados:
+                dfs_segunda_passagem(vizinho, visitados, componente_atual)
+
+    def inverter_arestas():
+        novo_adj_list = defaultdict(list)
+        for v in grafo.adj_list:
+            for item in grafo.adj_list[v]:
+                vizinho = item[1] if isinstance(item, tuple) else item
+                novo_adj_list[vizinho].append((item[0], v, item[2]) if isinstance(item, tuple) else (item[0], v))
+        grafo.adj_list = dict(novo_adj_list)
+
+    # Passo 1: Fazer uma DFS no grafo original para determinar a ordem de finalização dos vértices
     stack = []
+    visitados = set()
 
-    # Usando sua função DFS para a primeira passagem
-    def dfs_primeira_passagem(v):
-        if v not in visitados:
-            visitados.add(v)
-            tempo = 0
-            tempo = DFS(grafo, v, tempo, grafo.adj_list)  # Usa DFS para marcar tempos de finalização
-            stack.append(v)
-
-    # Primeira passagem: Preencher a pilha com a ordem de finalização dos vértices
     for vertice in grafo.vertices:
         if vertice not in visitados:
-            dfs_primeira_passagem(vertice)
+            dfs_primeira_passagem(vertice, visitados, stack)
 
-    # Inverter as arestas do grafo
-    grafo.inverter_arestas()
+    # Passo 2: Inverter as arestas do grafo
+    inverter_arestas()
+    
+    # Passo 3: Fazer uma DFS na ordem inversa da finalização
     visitados.clear()
+    componentes = []
 
-    # Segunda passagem: DFS na ordem inversa dos tempos de finalização para encontrar componentes
     while stack:
         v = stack.pop()
         if v not in visitados:
             componente_atual = []
-            tempo = 0
-            tempo = DFS(grafo, v, tempo, grafo.adj_list)  # Usa DFS para marcar os componentes
-            for u in grafo.vertices:
-                if grafo.vertices[u].cor == 'preto' and u not in visitados:
-                    componente_atual.append(u)
-                    visitados.add(u)
+            dfs_segunda_passagem(v, visitados, componente_atual)
             componentes.append(componente_atual)
 
-    # Reverter a inversão das arestas para restaurar o grafo original
-    grafo.inverter_arestas()
+    # Restaurar o grafo original invertendo as arestas novamente
+    inverter_arestas()
 
-    return componentes
-
+    return len(componentes)
 
 
 def listarCaminhoEuleriano(grafo):
@@ -179,47 +191,45 @@ def listarCaminhoEuleriano(grafo):
             return "Caminho Semi-Euleriano: " + str(caminho[::-1])
         
 
-def listarVerticesArticulacao(grafo):
-    vertices = grafo.vertices
-    visitados = {v: False for v in vertices}
-    descoberta = {v: float("inf") for v in vertices}
-    baixo = {v: float("inf") for v in vertices}
-    pai = {v: None for v in vertices}
-    tempo = [0]
-    articulacoes = []
-
-    def dfs(v):
-        visitados[v] = True
-        tempo[0] += 1
-        descoberta[v] = tempo[0]
-        baixo[v] = tempo[0]
+def encontrar_vertices_articulacao(grafo):
+    if grafo.direcionado:
+        return -1
+    
+    def dfs(v, tempo, parent=None):
+        grafo.vertices[v].cor = 'cinza'
+        grafo.vertices[v].tempo_descoberta = grafo.vertices[v].low = tempo
+        tempo += 1
         filhos = 0
-
-        for vizinho, peso in grafo.adj_list[v]:
-            if not visitados[vizinho]:
-                pai[vizinho] = v
+        eh_articulacao = False
+        
+        for _, vizinho, _ in grafo.adj_list[v]:
+            if grafo.vertices[vizinho].cor == 'branco':
                 filhos += 1
-                dfs(vizinho)
+                grafo.vertices[vizinho].pai = v
+                dfs(vizinho, tempo, v)
+                
+                grafo.vertices[v].low = min(grafo.vertices[v].low, grafo.vertices[vizinho].low)
 
-                baixo[v] = min(baixo[v], baixo[vizinho])
+                if parent is not None and grafo.vertices[vizinho].low >= grafo.vertices[v].tempo_descoberta:
+                    eh_articulacao = True
+            elif vizinho != parent:  # aresta de retorno
+                grafo.vertices[v].low = min(grafo.vertices[v].low, grafo.vertices[vizinho].tempo_descoberta)
 
-                # Verifica se v é articulação
-                if pai[v] is None and filhos > 1:
-                    articulacoes.append(v)
-                if pai[v] is not None and baixo[vizinho] >= descoberta[v]:
-                    articulacoes.append(v)
+        if parent is None and filhos > 1:
+            eh_articulacao = True
 
-            elif vizinho != pai[v]:
-                baixo[v] = min(baixo[v], descoberta[vizinho])
+        if eh_articulacao:
+            vertices_articulacao.append(v)
 
-    for v in vertices:
-        if not visitados[v]:
-            dfs(v)
+        grafo.vertices[v].cor = 'preto'
 
-    if not articulacoes:
-        return "O grafo não possui vértices de articulação."
-    else:
-        return articulacoes
+    vertices_articulacao = []
+    tempo_inicial = 0
+    for vertice in grafo.vertices:
+        if grafo.vertices[vertice].cor == 'branco':
+            dfs(vertice, tempo_inicial)
+    
+    return vertices_articulacao
     
 
 def listarArestasPonte(grafo):
@@ -262,7 +272,7 @@ def listarArestasPonte(grafo):
     if not pontes:
         return "O grafo não possui arestas de ponte."
     else:
-        return pontes
+        return len(pontes)
 
 def dfs_lexicografica(v, grafo, visitados, arestas_usadas):
     visitados[v] = True
@@ -306,41 +316,47 @@ def arvore_largura(grafo):
     return bfs_lexicografica(0, grafo)
 
 import heapq
-# Algoritmo de Prim para árvore geradora mínima
-def prim_lexicografico(grafo):
-    visitados = {v: False for v in grafo.vertices}
-    mst = []
-    min_heap = []
-    inicial = 0
 
+import heapq
+
+def arvore_geradora_minima(grafo):
+    if grafo.direcionado:
+        return -1
+
+    # Inicializa estruturas de dados
+    visitados = {v: False for v in grafo.vertices}
+    min_heap = []
+    total_peso = 0
+    inicial = next(iter(grafo.vertices))  # Começa com qualquer vértice
+
+    # Marca o vértice inicial como visitado e adiciona suas arestas à heap
     visitados[inicial] = True
     for aresta in grafo.adj_list[inicial]:
         id_aresta, vizinho, peso = aresta
-        heapq.heappush(min_heap, (peso, id_aresta, inicial, vizinho))
+        heapq.heappush(min_heap, (peso, inicial, vizinho))
 
     while min_heap:
-        peso, id_aresta, u, v = heapq.heappop(min_heap)
+        peso, u, v = heapq.heappop(min_heap)
         if not visitados[v]:
             visitados[v] = True
-            mst.append(id_aresta)
+            total_peso += peso
 
+            # Adiciona as arestas conectadas ao vértice 'v'
             for aresta in grafo.adj_list[v]:
                 id_aresta, vizinho, peso = aresta
                 if not visitados[vizinho]:
-                    heapq.heappush(min_heap, (peso, id_aresta, v, vizinho))
+                    heapq.heappush(min_heap, (peso, v, vizinho))
 
-    return mst
+    # Verifica se todos os vértices foram visitados
+    if len(visitados) != len(grafo.vertices):
+        return -1
 
-def arvore_geradora_minima(grafo):
-    if len(grafo.arestas) == 0:
-        return []  # Não há arestas para gerar uma árvore
-    return prim_lexicografico(grafo)
+    return total_peso
 
-from collections import defaultdict
 
 def ordem_topologica(grafo):
     # Verifica se o grafo é direcionado
-    if grafo.direcionado == False:
+    if not grafo.direcionado:
         return -1
 
     adj_list = grafo.adj_list
@@ -377,3 +393,134 @@ def ordem_topologica(grafo):
 
     # A pilha contém os vértices na ordem inversa da ordem topológica
     return pilha[::-1]
+
+def caminho_minimo(grafo):
+    # Verifica se todos os pesos das arestas são iguais
+    pesos = set()
+    for arestas in grafo.adj_list.values():
+        for aresta in arestas:
+            if isinstance(aresta, tuple):
+                peso = aresta[2]  # O peso está no terceiro índice (índice 2)
+            else:
+                peso = 1  # Peso padrão para arestas não ponderadas
+            pesos.add(peso)
+            if len(pesos) > 1:  # Se encontrar mais de um peso, podemos parar
+                break
+        if len(pesos) > 1:
+            break
+    
+    # Se todos os pesos forem iguais, retorna -1
+    if len(pesos) == 1:
+        return -1
+    if grafo.direcionado:
+        return -1
+
+    origem = 0
+    destino = len(grafo.vertices) - 1
+    distancias = {v: float('inf') for v in grafo.vertices}
+    distancias[origem] = 0
+    heap = [(0, origem)]  # (distância, vértice)
+    
+    while heap:
+        distancia_atual, vertice_atual = heapq.heappop(heap)
+        
+        if distancia_atual > distancias[vertice_atual]:
+            continue
+        
+        for aresta in grafo.adj_list[vertice_atual]:
+            if isinstance(aresta, tuple):
+                vizinho = aresta[1]
+                peso = aresta[2]  # O peso está no terceiro índice (índice 2)
+            else:
+                vizinho = aresta
+                peso = 1  # Peso padrão para arestas não ponderadas
+            
+            nova_distancia = distancia_atual + peso
+            
+            if nova_distancia < distancias[vizinho]:
+                distancias[vizinho] = nova_distancia
+                heapq.heappush(heap, (nova_distancia, vizinho))
+    
+    return distancias[destino] if distancias[destino] != float('inf') else -1
+
+
+from collections import deque, defaultdict
+
+def bfs(capacidade_residual, origem, destino):
+    fila = deque([origem])
+    caminhos = {origem: []}
+
+    while fila:
+        u = fila.popleft()
+
+        for v, capacidade in capacidade_residual[u].items():
+            if v not in caminhos and capacidade > 0:
+                caminhos[v] = caminhos[u] + [(u, v)]
+                if v == destino:
+                    return caminhos[v]
+                fila.append(v)
+
+    return None
+
+def valor_fluxo_maximo(grafo, origem, destino):
+    if not grafo.direcionado:
+        return -1
+    
+    capacidade_residual = defaultdict(dict)
+    
+    # Inicializa a capacidade residual do grafo
+    for u in grafo.adj_list:
+        for aresta in grafo.adj_list[u]:
+            v, capacidade = aresta[1], aresta[2]
+            capacidade_residual[u][v] = capacidade
+            if v not in capacidade_residual:  # Adiciona o vértice v na capacidade_residual se não existir
+                capacidade_residual[v] = defaultdict(int)
+            capacidade_residual[v][u] = 0  # Inicializa a capacidade da aresta reversa com 0
+
+    fluxo_maximo = 0
+    caminho = bfs(capacidade_residual, origem, destino)
+
+    while caminho:
+        fluxo_caminho = min(capacidade_residual[u][v] for u, v in caminho)
+        
+        for u, v in caminho:
+            capacidade_residual[u][v] -= fluxo_caminho
+            capacidade_residual[v][u] += fluxo_caminho
+        
+        fluxo_maximo += fluxo_caminho
+        caminho = bfs(capacidade_residual, origem, destino)
+    
+    return fluxo_maximo
+
+
+from collections import defaultdict, deque
+
+def fecho_transitivo(grafo):
+    if not grafo.direcionado:
+        return -1
+    # Inicializar o grafo de adjacência para o fecho transitivo
+    adj_list = defaultdict(list)
+    
+    # Construir a lista de adjacência a partir da estrutura do grafo
+    for u, adjacentes in grafo.adj_list.items():
+        for aresta in adjacentes:
+            # Considerar o segundo vértice da aresta (ignorar o idAresta e peso)
+            v = aresta[1]
+            adj_list[u].append(v)
+    
+    # O vértice inicial é 0
+    vertice_inicial = 0
+    visitados = set()
+    fila = deque([vertice_inicial])
+    
+    while fila:
+        u = fila.popleft()
+        
+        if u not in visitados:
+            visitados.add(u)
+            for v in sorted(adj_list[u]):
+                if v not in visitados:
+                    fila.append(v)
+    
+    # Excluir o próprio vértice inicial do fecho transitivo
+    return sorted(v for v in visitados if v != vertice_inicial)
