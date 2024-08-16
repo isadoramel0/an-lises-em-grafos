@@ -1,5 +1,5 @@
 from LereMontar.funcoesVerificar import Conexo, Bipartido, Euleriano, Cíclico
-from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima, ordem_topologica
+from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima, ordem_topologica, caminho_minimo
 
 
 def mostrar_menu_principal():
@@ -100,7 +100,7 @@ def processar_escolha_gerar(escolha, grafo):
         elif escolha == 'd':
             print(ordem_topologica(grafo))
         elif escolha == 'e':
-            print(f"Árvore geradora mínima: {gerarArvoreGeradoraMinima(grafo)}")
+            print(caminho_minimo(grafo))
         elif escolha == 'f':
             print(f"Ordem topológica: {gerarOrdemTopologica(grafo)}")
         elif escolha == 'g':

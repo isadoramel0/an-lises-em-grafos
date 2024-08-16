@@ -31,7 +31,7 @@ def Conexo(grafo):
             for vizinho in grafo.adj_list[v]:
                 if isinstance(vizinho, tuple):
                     adj_list_temporaria[v].append(vizinho)
-                    adj_list_temporaria[vizinho[0]].append((v, vizinho[1]))
+                    adj_list_temporaria[vizinho[1]].append((v, vizinho[1]))
                 else:
                     adj_list_temporaria[v].append(vizinho)
                     adj_list_temporaria[vizinho].append(v)
@@ -58,7 +58,7 @@ def Bipartido(grafo):
         cor[v] = current_color
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
-                vizinho = vizinho[0]
+                vizinho = vizinho[1]
             if cor[vizinho] == -1:
                 if not verificar_bipartido(grafo, vizinho, visitado, cor, 1 - current_color):
                     return False
@@ -89,7 +89,7 @@ def Euleriano(grafo):
         for v in grafo.vertices:
             for vizinho in grafo.adj_list[v]:
                 if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
+                    vizinho = vizinho[1]
                 grau_saida[v] += 1
                 grau_entrada[vizinho] += 1
         
@@ -107,7 +107,7 @@ def Euleriano(grafo):
         for v in grafo.vertices:
             for vizinho in grafo.adj_list[v]:
                 if isinstance(vizinho, tuple):
-                    vizinho = vizinho[0]
+                    vizinho = vizinho[1]
                 grau[v] += 1
         
         # Verifique se o grau de todos os vértices é par

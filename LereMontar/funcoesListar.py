@@ -231,16 +231,20 @@ def listarArestasPonte(grafo):
     pai = {v: None for v in vertices}
     tempo = [0]
     pontes = []
+
     # Função de busca em profundidade com Algoritmo de Tarjan
     def dfs(v):
         visitados[v] = True
         tempo[0] += 1
-        descoberta[v] = tempo[0]
-        baixo[v] = tempo[0]
+        descoberta[v] = baixo[v] = tempo[0]
 
-        for vizinho in grafo.adj_list[v]:
-            if isinstance(vizinho, tuple):
-                vizinho = vizinho[0]
+        for aresta in grafo.adj_list[v]:
+            if isinstance(aresta, tuple):
+                id_aresta, vizinho, peso = aresta
+            else:
+                id_aresta = None
+                vizinho = aresta
+                peso = None
 
             if not visitados[vizinho]:
                 pai[vizinho] = v
@@ -250,7 +254,7 @@ def listarArestasPonte(grafo):
 
                 # Verifica se (v, vizinho) é uma ponte
                 if baixo[vizinho] > descoberta[v]:
-                    pontes.append((v, vizinho))
+                    pontes.append(id_aresta)  # Adiciona apenas o id_aresta
 
             elif vizinho != pai[v]:
                 baixo[v] = min(baixo[v], descoberta[vizinho])
@@ -377,3 +381,55 @@ def ordem_topologica(grafo):
 
     # A pilha contém os vértices na ordem inversa da ordem topológica
     return pilha[::-1]
+
+import heapq
+
+def caminho_minimo(grafo):
+    # Verifica se todos os pesos das arestas são iguais
+    pesos = set()
+    for arestas in grafo.adj_list.values():
+        for aresta in arestas:
+            if isinstance(aresta, tuple):
+                peso = aresta[2]  # O peso está no terceiro índice (índice 2)
+            else:
+                peso = 1  # Peso padrão para arestas não ponderadas
+            pesos.add(peso)
+            if len(pesos) > 1:  # Se encontrar mais de um peso, podemos parar
+                break
+        if len(pesos) > 1:
+            break
+    
+    # Se todos os pesos forem iguais, retorna -1
+    if len(pesos) == 1:
+        return -1
+    if grafo.direcionado:
+        return -1
+
+    origem = 0
+    destino = len(grafo.vertices) - 1
+    distancias = {v: float('inf') for v in grafo.vertices}
+    distancias[origem] = 0
+    heap = [(0, origem)]  # (distância, vértice)
+    
+    while heap:
+        distancia_atual, vertice_atual = heapq.heappop(heap)
+        
+        if distancia_atual > distancias[vertice_atual]:
+            continue
+        
+        for aresta in grafo.adj_list[vertice_atual]:
+            if isinstance(aresta, tuple):
+                vizinho = aresta[1]
+                peso = aresta[2]  # O peso está no terceiro índice (índice 2)
+            else:
+                vizinho = aresta
+                peso = 1  # Peso padrão para arestas não ponderadas
+            
+            nova_distancia = distancia_atual + peso
+            
+            if nova_distancia < distancias[vizinho]:
+                distancias[vizinho] = nova_distancia
+                heapq.heappush(heap, (nova_distancia, vizinho))
+    
+    return distancias[destino] if distancias[destino] != float('inf') else -1
+
