@@ -1,8 +1,8 @@
 def DFS(grafo, v, tempo, adj_list):
     vertice = grafo.vertices[v]
-    vertice.cor = 'cinza'
+    vertice.cor = 'cinza' # Vértice em processo de exploração
     tempo += 1
-    vertice.tempo_descoberta = tempo
+    vertice.tempoDescoberta = tempo
 
     for vizinho in adj_list[v]:
         if isinstance(vizinho, tuple):
@@ -10,14 +10,14 @@ def DFS(grafo, v, tempo, adj_list):
         else:
             vizinho_id = vizinho
 
-        vizinho_obj = grafo.vertices[vizinho_id]
-        if vizinho_obj.cor == 'branco':
-            vizinho_obj.pai = v
-            tempo = DFS(grafo, vizinho_id, tempo, adj_list)
+        vizinhoObj = grafo.vertices[vizinho_id]
+        if vizinhoObj.cor == 'branco':   # Se o vértice não foi visitado
+            vizinhoObj.pai = v # Define o pai do vértice
+            tempo = DFS(grafo, vizinho_id, tempo, adj_list) 
 
-    vertice.cor = 'preto'
+    vertice.cor = 'preto' # Vértice finalizado
     tempo += 1
-    vertice.tempo_finalizacao = tempo
+    vertice.tempoFinalizacao = tempo # Define o tempo de finalização
 
     return tempo
 
@@ -26,24 +26,24 @@ def DFS(grafo, v, tempo, adj_list):
 def Conexo(grafo):
     # Se o grafo é direcionado, criamos uma lista de adjacência temporária com arestas bidirecionais
     if grafo.direcionado:
-        adj_list_temporaria = {v: [] for v in grafo.vertices}
+        adj_listTemp = {v: [] for v in grafo.vertices}
         for v in grafo.adj_list:
             for vizinho in grafo.adj_list[v]:
                 if isinstance(vizinho, tuple):
-                    adj_list_temporaria[v].append(vizinho)
-                    adj_list_temporaria[vizinho[1]].append((v, vizinho[1]))
+                    adj_listTemp[v].append(vizinho) # Adiciona a aresta original
+                    adj_listTemp[vizinho[1]].append((v, vizinho[1])) # Adiciona a aresta inversa
                 else:
-                    adj_list_temporaria[v].append(vizinho)
-                    adj_list_temporaria[vizinho].append(v)
+                    adj_listTemp[v].append(vizinho)
+                    adj_listTemp[vizinho].append(v)
     else:
-        adj_list_temporaria = grafo.adj_list
+        adj_listTemp = grafo.adj_list
 
     # Escolhe o primeiro vértice da lista de vértices para começar a DFS
-    vertice_inicial = list(grafo.vertices.keys())[0]
+    verticeInicial = list(grafo.vertices.keys())[0]
 
     # Realiza a DFS a partir do vértice inicial usando a lista de adjacência apropriada
     tempo = 0
-    DFS(grafo, vertice_inicial, tempo, adj_list_temporaria)
+    DFS(grafo, verticeInicial, tempo, adj_listTemp)
 
     # Verifica se todos os vértices foram alcançados
     if (all(grafo.vertices[vertice].cor == 'preto' for vertice in grafo.vertices)):
@@ -54,54 +54,55 @@ def Conexo(grafo):
 
 # ------- Bipartido
 def Bipartido(grafo):
-    def verificar_bipartido(grafo, v, visitado, cor, current_color):
-        cor[v] = current_color
+
+    # A lógica é a mesma da DFS, mas a personalização é feita para colorir os vértices adjacentes com cores diferentes para identificar se o grafo é bipartido
+    def verificarBipartido(grafo, v, cor, corAtual):
+        cor[v] = corAtual
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
                 vizinho = vizinho[1]
             if cor[vizinho] == -1:
-                if not verificar_bipartido(grafo, vizinho, visitado, cor, 1 - current_color):
+                if not verificarBipartido(grafo, vizinho, cor, 1 - corAtual): # Se o vértice vizinho não foi visitado aplicamos a DFS nele
                     return False
-            elif cor[vizinho] == cor[v]:
+            elif cor[vizinho] == cor[v]: # Se o vértice vizinho tem a mesma cor que o vértice atual
                 return False
         return True
 
     cor = {v: -1 for v in grafo.vertices}
 
     for vertice in grafo.vertices:
-        if cor[vertice] == -1:
-            if not verificar_bipartido(grafo, vertice, set(), cor, 0):
+        if cor[vertice] == -1: # Se o vértice ainda não foi visitado 
+            if not verificarBipartido(grafo, vertice, cor, 0): 
                 return "0"
 
     return "1"
 
-
 # ------- Euleriano
 def Euleriano(grafo):
-    if not Conexo(grafo):
+    if not Conexo(grafo): # Se o grafo não é conexo, ele não pode ser euleriano
         return "0"
     
     if grafo.direcionado:
-        # Verifique se o grafo direcionado é euleriano
-        grau_entrada = {v: 0 for v in grafo.vertices}
-        grau_saida = {v: 0 for v in grafo.vertices}
+        # Verifica se o grafo direcionado é euleriano (grau de entrada = grau de saída)
+        grauEntrada = {v: 0 for v in grafo.vertices}
+        grauSaida = {v: 0 for v in grafo.vertices}
         
         for v in grafo.vertices:
             for vizinho in grafo.adj_list[v]:
                 if isinstance(vizinho, tuple):
                     vizinho = vizinho[1]
-                grau_saida[v] += 1
-                grau_entrada[vizinho] += 1
+                grauSaida[v] += 1
+                grauEntrada[vizinho] += 1
         
-        # Verifique se os graus de entrada e saída são iguais para todos os vértices
+        # Verifica se os graus de entrada e saída são iguais para todos os vértices
         for v in grafo.vertices:
-            if grau_entrada[v] != grau_saida[v]:
+            if grauEntrada[v] != grauSaida[v]:
                 return "0"
             
         return "1"
 
     else:
-        # Verifique se o grafo não direcionado é euleriano
+        # Verifica se o grafo não direcionado é euleriano
         grau = {v: 0 for v in grafo.vertices}
         
         for v in grafo.vertices:
@@ -110,7 +111,7 @@ def Euleriano(grafo):
                     vizinho = vizinho[1]
                 grau[v] += 1
         
-        # Verifique se o grau de todos os vértices é par
+        # Verifica se o grau de todos os vértices é par
         for v in grafo.vertices:
             if grau[v] % 2 != 0:
                 return "0"
@@ -120,22 +121,23 @@ def Euleriano(grafo):
 
 # ------- Procura ciclo
 def Cíclico(grafo):
-    def verificar_ciclo(grafo, v, visitado, pai):
-        visitado.add(v)
+
+    def verificarCiclo(grafo, v, visitado, pai):
+        visitado.add(v) # Adiciona o vértice atual à lista de visitados
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
                 vizinho = vizinho[0]
             if vizinho not in visitado:
-                if verificar_ciclo(grafo, vizinho, visitado, v):
+                if verificarCiclo(grafo, vizinho, visitado, v):
                     return True
-            elif vizinho != pai:
+            elif vizinho != pai: # Se o vértice vizinho já foi visitado e não é o pai do vértice atual, então encontramos um ciclo 
                 return True
         return False
 
-    visitado = set()
+    visitado = set() # Lista de vértices visitados
     
     for vertice in grafo.vertices:
         if vertice not in visitado:
-            if verificar_ciclo(grafo, vertice, visitado, None):
+            if verificarCiclo(grafo, vertice, visitado, None):
                 return "1"
     return "0"
