@@ -1,9 +1,5 @@
 from LereMontar.funcoesVerificar import Conexo, Bipartido, Euleriano, Cíclico
-<<<<<<< HEAD
-from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, listarVerticesArticulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, arvore_geradora_minima, ordem_topologica, caminho_minimo
-=======
 from LereMontar.funcoesListar import  ComponentesConexas, ComponentesFortementeConexas, encontrar_vertices_articulacao, listarArestasPonte, arvore_lexicografica, arvore_largura, listarCaminhoEuleriano, arvore_geradora_minima, ordem_topologica, caminho_minimo, valor_fluxo_maximo, fecho_transitivo
->>>>>>> 9b9e95179cdd007fefbb38d0f7ae19658cac6d67
 
 
 def mostrar_menu_principal():

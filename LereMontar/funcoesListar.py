@@ -398,11 +398,6 @@ def ordem_topologica(grafo):
     # A pilha contém os vértices na ordem inversa da ordem topológica
     return pilha[::-1]
 
-<<<<<<< HEAD
-import heapq
-
-=======
->>>>>>> 9b9e95179cdd007fefbb38d0f7ae19658cac6d67
 def caminho_minimo(grafo):
     # Verifica se todos os pesos das arestas são iguais
     pesos = set()
@@ -452,8 +447,6 @@ def caminho_minimo(grafo):
     
     return distancias[destino] if distancias[destino] != float('inf') else -1
 
-<<<<<<< HEAD
-=======
 
 from collections import deque, defaultdict
 
@@ -535,4 +528,3 @@ def fecho_transitivo(grafo):
     
     # Excluir o próprio vértice inicial do fecho transitivo
     return sorted(v for v in visitados if v != vertice_inicial)
->>>>>>> 9b9e95179cdd007fefbb38d0f7ae19658cac6d67
