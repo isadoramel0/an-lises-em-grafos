@@ -8,6 +8,9 @@ class Vertice:
         self.pai = None
         self.tempo_descoberta = None
         self.tempo_finalizacao = None
+    
+    def __str__(self):
+        return str(self.id)
 
 class Grafo:
     def __init__(self, vertices, arestas, direcionado=False):
@@ -85,7 +88,7 @@ def Bipartido(grafo):
         cor[v] = current_color
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
-                vizinho = vizinho[0]
+                vizinho = vizinho[1]
             if cor[vizinho] == -1:
                 if not verificar_bipartido(grafo, vizinho, visitado, cor, 1 - current_color): # Se o vértice vizinho não foi visitado aplicamos a DFS nele
                     return False
@@ -152,7 +155,7 @@ def Cíclico(grafo):
         visitado.add(v) # Adiciona o vértice atual à lista de visitados
         for vizinho in grafo.adj_list[v]:
             if isinstance(vizinho, tuple):
-                vizinho = vizinho[0]
+                vizinho = vizinho[1]
             if vizinho not in visitado:
                 if verificarCiclo(grafo, vizinho, visitado, v):
                     return True
@@ -389,7 +392,7 @@ def VerticesArticulacao(grafo):
         if grafo.vertices[vertice].cor == 'branco':
             dfs(vertice, tempo_inicial)
     
-    return vertices_articulacao
+    return len(vertices_articulacao)
     
 
 # ------- Arestas Ponte
@@ -477,8 +480,10 @@ def ArvoreLargura(grafo):
                     idArestas_usadas.append(id_aresta)
 
         return idArestas_usadas
-
-    return bfs(0, grafo)
+    ids_aresta = bfs(0, grafo)
+    # Converte a lista para uma string onde os IDs estão separados por espaço
+    ids_aresta_string = ' '.join(map(str, ids_aresta))
+    return ids_aresta_string
 
 
 # ------- Árvore geradora mínima
@@ -557,9 +562,14 @@ def OrdemTopologica(grafo):
             visitado.add(vertice)
             dfs_pilha(grafo, vertice, 0, adj_list, visitado, pilha)
 
+    for v in grafo.vertices.keys():
+        if v not in visitado:
+            visitado.add(v)
+            dfs_pilha(grafo, v, 0, adj_list, visitado, pilha)
+
     # A pilha contém os vértices na ordem inversa da ordem topológica
     return pilha[::-1]
-
+    
 
 # Valor do caminho mínimo entre dois vértices 
 def CaminhoMinimo(grafo):
