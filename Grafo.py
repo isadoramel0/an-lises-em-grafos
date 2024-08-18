@@ -259,7 +259,7 @@ def ComponentesFortementeConexas(grafo):
     return len(componentes)
 
 
-# ------- Trilha Euleriana
+# ------- Caminho Euleriana
 def listarCaminhoEuleriano(grafo):
     grau_saida = {v: 0 for v in grafo.vertices}
     grau_entrada = {v: 0 for v in grafo.vertices}
@@ -626,21 +626,22 @@ def CaminhoMinimo(grafo):
 def FluxoMaximo(grafo):
     origem = 0
     destino = len(grafo.vertices) - 1
-    def bfs(capacidade_residual, origem, destino):
-        fila = deque([origem])
-        caminhos = {origem: []}
 
-        while fila:
-            u = fila.popleft()
+    def dfs(capacidade_residual, origem, destino, caminho, visitados):
+        visitados.add(origem)
+        if origem == destino:
+            return caminho
 
-            for v, capacidade in capacidade_residual[u].items():
-                if v not in caminhos and capacidade > 0:
-                    caminhos[v] = caminhos[u] + [(u, v)]
-                    if v == destino:
-                        return caminhos[v]
-                    fila.append(v)
-
-        return None
+        for v, capacidade in capacidade_residual[origem].items():
+            if v not in visitados and capacidade > 0:
+                fluxo_caminho = min(caminho, capacidade)
+                resultado = dfs(capacidade_residual, v, destino, fluxo_caminho, visitados)
+                if resultado > 0:
+                    capacidade_residual[origem][v] -= resultado
+                    capacidade_residual[v][origem] += resultado
+                    return resultado
+        
+        return 0
 
     if not grafo.direcionado:
         return -1
@@ -657,19 +658,14 @@ def FluxoMaximo(grafo):
             capacidade_residual[v][u] = 0  # Inicializa a capacidade da aresta reversa com 0
 
     fluxo_maximo = 0
-    caminho = bfs(capacidade_residual, origem, destino)
+    fluxo_caminho = dfs(capacidade_residual, origem, destino, float('Inf'), set())
 
-    while caminho:
-        fluxo_caminho = min(capacidade_residual[u][v] for u, v in caminho)
-        
-        for u, v in caminho:
-            capacidade_residual[u][v] -= fluxo_caminho
-            capacidade_residual[v][u] += fluxo_caminho
-        
+    while fluxo_caminho:
         fluxo_maximo += fluxo_caminho
-        caminho = bfs(capacidade_residual, origem, destino)
+        fluxo_caminho = dfs(capacidade_residual, origem, destino, float('Inf'), set())
     
     return fluxo_maximo
+
 
 # Fecho transitivo
 def FechoTransitivo(grafo):
