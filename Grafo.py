@@ -203,36 +203,35 @@ def ComponentesConexas(grafo):
 
 # ------- Componentes Fortemente Conexas
 def ComponentesFortementeConexas(grafo):
-
     if not grafo.direcionado:
         return -1
     
     # Algortimo de Kosaraju 
     def dfsGrafo_Original(v, visitados, stack):
         visitados.add(v)
-        for vizinho in grafo.adj_list[v]:
-            if isinstance(vizinho, tuple):  # Arestas como tuplas
-                vizinho = vizinho[1] 
+        for item in grafo.adj_list.get(v, []):
+            vizinho = item[1] if isinstance(item, tuple) else item
+
             if vizinho not in visitados:
                 dfsGrafo_Original(vizinho, visitados, stack)
-        stack.append(v) # Adiciona o vértice à pilha conforme a ordem de finalização
+        stack.append(v) # Adiciona o vértice à pilha
 
     def dfsGrafo_alterado(v, visitados, componente_atual):
         visitados.add(v)
         componente_atual.append(v)
-        for vizinho in grafo.adj_list[v]:
-            if isinstance(vizinho, tuple):  # Arestas como tuplas
-                vizinho = vizinho[1] 
+        
+        for item in grafo.adj_list.get(v, []):
+            vizinho = item[1] if isinstance(item, tuple) else item
             if vizinho not in visitados:
                 dfsGrafo_alterado(vizinho, visitados, componente_atual)
 
     def inverterArestas():
-        adj_list_invert = defaultdict(list)
+        novaAdj_list = defaultdict(list)
         for v in grafo.adj_list:
             for item in grafo.adj_list[v]:
                 vizinho = item[1] if isinstance(item, tuple) else item
-                adj_list_invert[vizinho].append((item[0], v, item[2]) if isinstance(item, tuple) else (item[0], v))
-        grafo.adj_list = dict(adj_list_invert)
+                novaAdj_list[vizinho].append((item[0], v, item[2]) if isinstance(item, tuple) else (item[0], v))
+        grafo.adj_list = dict(novaAdj_list)
 
     # Passo 1: Fazer uma DFS no grafo original para determinar a ordem de finalização dos vértices
     stack = []
@@ -491,22 +490,23 @@ def ArvoreGeradoraMinima(grafo):
     return totalPeso
 
 
-# Ordem topológica 
+# ------- Ordem topológica 
 def OrdemTopologica(grafo):
     # Verifica se o grafo é direcionado
     if not grafo.direcionado:
         return -1
 
+    adj_list = grafo.adj_list
     pilha = []
     visitado = set()
 
-    def dfs_pilha(grafo, v, tempo, visitado, pilha):
+    def dfs_pilha(grafo, v, tempo, adj_list, visitado, pilha):
         vertice = grafo.vertices[v]
         vertice.cor = 'cinza'
         tempo += 1
         vertice.tempo_descoberta = tempo
 
-        for vizinho in grafo.adj_list[v]:
+        for vizinho in adj_list.get(v,[]):
             if isinstance(vizinho, tuple):
                 vizinho_id = vizinho[1]  
             else:
@@ -514,7 +514,7 @@ def OrdemTopologica(grafo):
 
             if vizinho_id not in visitado:
                 visitado.add(vizinho_id)
-                tempo = dfs_pilha(grafo, vizinho_id, tempo, visitado, pilha) # Chama a DFS recursivamente aumentando o tempo
+                tempo = dfs_pilha(grafo, vizinho_id, tempo, adj_list, visitado, pilha) # Chama a DFS recursivamente aumentando o tempo
 
         # Quando não houver mais vizinhos, o vértice é finalizado e adicionado à pilha
         vertice.cor = 'preto'
@@ -527,13 +527,13 @@ def OrdemTopologica(grafo):
     for vertice in grafo.vertices:
         if vertice not in visitado:
             visitado.add(vertice)
-            dfs_pilha(grafo, vertice, 0, visitado, pilha)
+            dfs_pilha(grafo, vertice, 0, adj_list, visitado, pilha)
+
 
     # A pilha contém os vértices na ordem inversa da ordem topológica
     return pilha[::-1]
-    
 
-# Valor do caminho mínimo entre dois vértices 
+# ------- Valor do caminho mínimo entre dois vértices 
 def CaminhoMinimo(grafo):
     # Verifica se todos os pesos das arestas são iguais
     pesos = set()
@@ -586,7 +586,7 @@ def CaminhoMinimo(grafo):
        return -1
 
 
-# Valor do fluxo máximo
+# ------- Valor do fluxo máximo
 def FluxoMaximo(grafo):
     if not grafo.direcionado:
         return -1
@@ -635,21 +635,20 @@ def FluxoMaximo(grafo):
     return fluxo_maximo
 
 
-# Fecho transitivo
+# ------- Fecho transitivo
 def FechoTransitivo(grafo):
     if not grafo.direcionado:
         return -1
+    
     # Inicializar o grafo de adjacência para o fecho transitivo
     adj_list = defaultdict(list)
     
-    # Construir a lista de adjacência a partir da estrutura do grafo
+    # Construir a lista de adjacência 
     for u, adjacentes in grafo.adj_list.items():
         for aresta in adjacentes:
-            # Considerar o segundo vértice da aresta (ignorar o idAresta e peso)
             v = aresta[1]
             adj_list[u].append(v)
     
-    # O vértice inicial é 0
     vertice_inicial = 0
     visitados = set()
     fila = deque([vertice_inicial])
@@ -667,7 +666,7 @@ def FechoTransitivo(grafo):
     return sorted(v for v in visitados if v != vertice_inicial)
 
 
-def ler_grafo():
+def LerGrafo():
     # Ler a lista de funções a serem executadas
     funcoes = list(map(int, input().strip().split()))
     
@@ -708,8 +707,6 @@ def ler_grafo():
             resultados.append(ComponentesConexas(grafo))
         elif funcao == 5:
             resultados.append(ComponentesFortementeConexas(grafo))
-        # elif funcao == 6:
-        #     resultados.append(listarCaminhoEuleriano(grafo))
         elif funcao == 6:
             resultados.append(VerticesArticulacao(grafo))
         elif funcao == 7:
@@ -735,10 +732,8 @@ def ler_grafo():
 
 if __name__ == "__main__":
     try:
-        resultados = ler_grafo()
+        resultados = LerGrafo()
         for resultado in resultados:
             print(resultado)
     except ValueError as e:
         print(f"Erro: {e}")
-    # except Exception as e:
-    #     print(f"Erro inesperado: {e}")
